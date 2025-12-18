@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/batch_llm/sw.js', { scope: '/batch_llm/' })})}
