@@ -1,73 +1,73 @@
-# React + TypeScript + Vite
+# Batch LLM Studio (PWA)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A powerful, privacy-first Progressive Web App for running batch inference tasks using local LLMs (like [LM Studio](https://lmstudio.ai/) and [Ollama](https://ollama.com/)) as well as cloud providers (OpenAI, Google Gemini).
 
-Currently, two official plugins are available:
+![Batch LLM Studio Screenshot](public/pwa-512x512.png)
+*(Replace with actual screenshot)*
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features
 
-## React Compiler
+- **100% Local Storage**: All projects, data, and API keys are stored in your browser's IndexedDB. Nothing leaves your device unless you send it to an API.
+- **Batch Processing**: Import CSV files and process thousands of rows with configurable concurrency.
+- **Dynamic Prompts**: Map CSV columns to prompts using `{{column_name}}` syntax.
+- **Multi-Provider Support**: 
+    - **Local**: LM Studio, Ollama
+    - **Cloud**: OpenAI, Google Gemini, OpenRouter
+- **Resilient**: Automatic retry for failed rows, pause/resume capability, and rate limiting (delay) controls.
+- **Responsive PWA**: Installable on Desktop and Mobile.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Getting Started
 
-## Expanding the ESLint configuration
+### Hosted Version
+Use the production app directly at: **[https://kltng.github.io/batch_llm/](https://kltng.github.io/batch_llm/)**
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Local Development
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/kltng/batch_llm.git
+    cd batch_llm
+    ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+3.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+4.  Open `http://localhost:5173` in your browser.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🛠 Usage Guide
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### 1. Connecting to Local LLMs
+
+**LM Studio:**
+1.  Start LM Studio and load a model.
+2.  Go to the **Developer/Server** tab (monitor icon).
+3.  Start the server. **Crucial**: Ensure "CORS" is enabled.
+4.  In Batch LLM Studio, select **LM Studio** as the provider (default URL: `http://localhost:1234/v1`).
+
+**Ollama:**
+1.  Start Ollama.
+2.  Set the environment variable `OLLAMA_ORIGINS="*"` (or include the app URL) to allow browser requests.
+    - *Mac/Linux*: `OLLAMA_ORIGINS="*" ollama serve`
+3.  In Batch LLM Studio, select **Ollama** as the provider (default URL: `http://localhost:11434/v1`).
+
+### 2. Workflow
+1.  **New Project**: Create a named workspace.
+2.  **Import CSV**: Upload your dataset.
+3.  **Setup**: Configure your System Prompt and User Prompt. Use `{{header}}` to insert data from your CSV rows.
+4.  **Batch Run**: Set concurrency (e.g., 5 parallel requests) and start the job.
+5.  **Export**: Download the completed dataset with model responses.
+
+## 🤝 Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+
+## 📄 License
+
+[MIT](https://choosealicense.com/licenses/mit/)

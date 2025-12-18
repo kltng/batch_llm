@@ -2,7 +2,7 @@ import { Outlet, NavLink } from "react-router-dom"
 import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/db/db"
 import { Button } from "@/components/ui/button"
-import { Plus, Database, Settings } from "lucide-react"
+import { Plus, Database, Settings, BookOpen } from "lucide-react"
 import { ModeToggle } from "@/components/mode-toggle"
 
 export default function Layout() {
@@ -45,6 +45,12 @@ export default function Layout() {
                         <NavLink to="/">
                             <Plus className="h-4 w-4" />
                             New Project
+                        </NavLink>
+                    </Button>
+                    <Button variant="ghost" className="w-full justify-start gap-2" asChild>
+                        <NavLink to="/instructions">
+                            <BookOpen className="h-4 w-4" />
+                            Instructions
                         </NavLink>
                     </Button>
                     <Button variant="ghost" className="w-full justify-start gap-2" asChild>

@@ -3,6 +3,7 @@ import Layout from "./components/layout/Layout"
 import ProjectList from "./features/projects/ProjectList"
 import Workspace from "./features/projects/Workspace"
 import GlobalSettings from "./features/settings/GlobalSettings"
+import InstructionPage from "./features/instructions/InstructionPage"
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route path="/" element={<ProjectList />} />
           <Route path="/project/:id" element={<Workspace />} />
           <Route path="/settings" element={<GlobalSettings />} />
+          <Route path="/instructions" element={<InstructionPage />} />
         </Route>
       </Routes>
     </HashRouter>
