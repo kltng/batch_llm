@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { HashRouter, Routes, Route } from "react-router-dom"
 import Layout from "./components/layout/Layout"
 import ProjectList from "./features/projects/ProjectList"
 import Workspace from "./features/projects/Workspace"
@@ -6,7 +6,7 @@ import GlobalSettings from "./features/settings/GlobalSettings"
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<ProjectList />} />
@@ -14,7 +14,7 @@ function App() {
           <Route path="/settings" element={<GlobalSettings />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 
