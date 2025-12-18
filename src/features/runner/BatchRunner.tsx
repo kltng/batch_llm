@@ -25,15 +25,9 @@ export default function BatchRunner({ projectId }: { projectId: number }) {
     const [delaySeconds, setDelaySeconds] = useState(0)
     const stopRef = useRef(false)
 
-    // Helpers to get creds
-    const getBaseUrl = async (provider: string) => {
-        const s = await db.settings.get(1);
-        return s?.providers?.[provider]?.baseUrl || ""
-    }
-    const getApiKey = async (provider: string) => {
-        const s = await db.settings.get(1);
-        return s?.providers?.[provider]?.apiKey || ""
-    }
+    // Helpers to get creds (updated to respect global vs project)
+    // NOTE: We check project config inside processRow now, but we need helpers or just inline it?
+    // Let's inline resolution in processRow for clarity.
 
     const processRow = async (row: DataRow, proj: any) => {
         if (stopRef.current) return;
@@ -56,8 +50,20 @@ export default function BatchRunner({ projectId }: { projectId: number }) {
 
             if (!proj.modelConfig?.provider) throw new Error("No provider configured");
 
-            const baseUrl = await getBaseUrl(proj.modelConfig.provider);
-            const apiKey = await getApiKey(proj.modelConfig.provider);
+            let baseUrl = "";
+            let apiKey = "";
+
+            if (proj.modelConfig.useGlobal === false && proj.modelConfig.baseUrl) {
+                // Using override
+                baseUrl = proj.modelConfig.baseUrl;
+                apiKey = proj.modelConfig.apiKey || "";
+            } else {
+                // Using global - fetch it
+                const settings = await db.settings.get(1);
+                const p = settings?.providers?.[proj.modelConfig.provider];
+                baseUrl = p?.baseUrl || "";
+                apiKey = p?.apiKey || "";
+            }
 
             // 3. Call API
             const response = await generateCompletion({

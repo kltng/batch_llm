@@ -12,6 +12,10 @@ export interface Project {
         model: string;
         temperature?: number;
         maxTokens?: number;
+        // Overrides
+        baseUrl?: string;
+        apiKey?: string;
+        useGlobal?: boolean;
     };
 }
 

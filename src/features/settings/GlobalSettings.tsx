@@ -7,6 +7,17 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Save, Trash2, Key, Database, Globe } from "lucide-react"
 import { useState, useEffect } from "react"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 const PROVIDERS = [
     { id: 'lmstudio', name: 'LM Studio', defaultUrl: 'http://localhost:1234/v1' },
@@ -21,6 +32,7 @@ export default function GlobalSettings() {
     const settings = useLiveQuery(() => db.settings.get(1))
     const [localProviders, setLocalProviders] = useState<Record<string, any>>({})
     const [isSaving, setIsSaving] = useState(false)
+    const [isClearing, setIsClearing] = useState(false)
 
     useEffect(() => {
         if (settings?.providers) {
@@ -45,8 +57,11 @@ export default function GlobalSettings() {
         }))
     }
 
+    const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null)
+
     const saveAll = async () => {
         setIsSaving(true)
+        setStatus(null)
         try {
             const current = await db.settings.get(1)
             if (!current) {
@@ -54,19 +69,25 @@ export default function GlobalSettings() {
             } else {
                 await db.settings.update(1, { providers: localProviders })
             }
-            alert("All global credentials saved!")
+            setStatus({ type: 'success', message: 'All global credentials saved successfully!' })
+        } catch (err: any) {
+            setStatus({ type: 'error', message: `Error saving: ${err.message}` })
         } finally {
             setIsSaving(false)
         }
     }
 
     const clearAllData = async () => {
-        if (confirm("Are you sure? This will delete all projects, CSV data, and results. This cannot be undone.")) {
+        setIsClearing(true)
+        try {
             await db.rows.clear()
             await db.projects.clear()
-            // Keep settings? Usually safer to keep settings but clear data.
-            alert("Database cleared.")
+            // Small delay to let DB settle
+            await new Promise(r => setTimeout(r, 500))
             window.location.href = "/"
+        } catch (err) {
+            console.error("Failed to clear", err)
+            setIsClearing(false)
         }
     }
 
@@ -85,10 +106,17 @@ export default function GlobalSettings() {
                         <Key className="h-5 w-5 text-primary" />
                         <h2>API Credentials</h2>
                     </div>
-                    <Button onClick={saveAll} disabled={isSaving}>
-                        <Save className="mr-2 h-4 w-4" />
-                        {isSaving ? "Saving..." : "Save All Changes"}
-                    </Button>
+                    <div className="flex items-center gap-4">
+                        {status && (
+                            <span className={`text-sm font-medium ${status.type === 'success' ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
+                                {status.message}
+                            </span>
+                        )}
+                        <Button onClick={saveAll} disabled={isSaving}>
+                            <Save className="mr-2 h-4 w-4" />
+                            {isSaving ? "Saving..." : "Save All Changes"}
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -142,9 +170,28 @@ export default function GlobalSettings() {
                                 Your API keys in the section above will be preserved.
                             </p>
                         </div>
-                        <Button variant="destructive" onClick={clearAllData} className="shrink-0">
-                            Clear All Projects
-                        </Button>
+
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive" className="shrink-0" disabled={isClearing}>
+                                    {isClearing ? "Clearing..." : "Clear All Projects"}
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently delete your projects and all associated data from the local database.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={clearAllData} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                        Yes, Delete Everything
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </CardContent>
                 </Card>
             </div>

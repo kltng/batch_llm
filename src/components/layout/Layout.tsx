@@ -3,6 +3,7 @@ import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/db/db"
 import { Button } from "@/components/ui/button"
 import { Plus, Database, Settings } from "lucide-react"
+import { ModeToggle } from "@/components/mode-toggle"
 
 export default function Layout() {
     const projects = useLiveQuery(() => db.projects.toArray())
@@ -52,6 +53,9 @@ export default function Layout() {
                             Settings
                         </NavLink>
                     </Button>
+                    <div className="pt-2 flex justify-center">
+                        <ModeToggle />
+                    </div>
                 </div>
             </aside>
 
