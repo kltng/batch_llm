@@ -22,6 +22,7 @@ export default function BatchRunner({ projectId }: { projectId: number }) {
 
     const [isRunning, setIsRunning] = useState(false)
     const [concurrency, setConcurrency] = useState(3)
+    const [delaySeconds, setDelaySeconds] = useState(0)
     const stopRef = useRef(false)
 
     // Helpers to get creds
@@ -117,8 +118,13 @@ export default function BatchRunner({ projectId }: { projectId: number }) {
 
             await Promise.all(candidates.map(row => processRow(row, project)))
 
-            // Small breathing room
-            await new Promise(r => setTimeout(r, 100))
+            // Delay between queries (or batches)
+            if (delaySeconds > 0 && !stopRef.current) {
+                await new Promise(r => setTimeout(r, delaySeconds * 1000))
+            } else {
+                // Small breathing room
+                await new Promise(r => setTimeout(r, 100))
+            }
         }
         setIsRunning(false)
     }
@@ -165,6 +171,19 @@ export default function BatchRunner({ projectId }: { projectId: number }) {
                                 max={20}
                                 value={concurrency}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConcurrency(parseInt(e.target.value))}
+                                disabled={isRunning}
+                            />
+                        </div>
+
+                        <div className="w-32">
+                            <Label>Delay (s)</Label>
+                            <Input
+                                type="number"
+                                min={0}
+                                max={120}
+                                value={delaySeconds}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDelaySeconds(parseInt(e.target.value))}
+                                disabled={isRunning}
                             />
                         </div>
 
